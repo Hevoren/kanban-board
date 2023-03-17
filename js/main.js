@@ -12,10 +12,10 @@ Vue.component('all-notes', {
 Vue.component('notes', {
     template: `
         <div class="notes">
-            <note :column="columns[0]" :errors="errors_1" :name="nameFirst" @deleteTask="deleteTask" @nextColumn="nextColumn" @editTask="editTask" :columnIndex="columnIndex1"></note>
-            <note :column="columns[1]" :errors="errors_2" :name="nameSecond" @nextColumn="nextColumn" :columnIndex="columnIndex2"></note>
-            <note :column="columns[2]" :errors="errors_3" :name="nameThird" @nextColumn="nextColumn" @reasonBackFun="reasonBackFun" @reasonStatusEdit="reasonStatusEdit" :columnIndex="columnIndex3" ></note>
-            <note :column="columns[3]" :errors="errors_4" :name="nameFourth" :columnIndex="columnIndex4"></note>
+            <note :column="columns[0]" :errors="errors" :name="nameFirst"   :columnIndex="columnIndex1" @deleteTask="deleteTask" @nextColumn="nextColumn"       @editTask="editTask"></note>
+            <note :column="columns[1]" :errors="errors" :name="nameSecond"  :columnIndex="columnIndex2" @nextColumn="nextColumn" @clearTrues="clearTrues"></note>
+            <note :column="columns[2]" :errors="errors" :name="nameThird"   :columnIndex="columnIndex3" @nextColumn="nextColumn" @reasonBackFun="reasonBackFun" @reasonStatusEdit="reasonStatusEdit"></note>
+            <note :column="columns[3]" :errors="errors" :name="nameFourth"  :columnIndex="columnIndex4" :gg="gg" :errorGG="errorGG"></note>
         </div>
     `,
 
@@ -28,10 +28,7 @@ Vue.component('notes', {
                 [],
             ],
 
-            errors_1: [],
-            errors_2: [],
-            errors_3: [],
-            errors_4: [],
+            errors: [],
 
             nameFirst: 'В работе',
             nameSecond: 'Тестирование',
@@ -42,12 +39,13 @@ Vue.component('notes', {
             columnIndex2: 1,
             columnIndex3: 2,
             columnIndex4: 3,
+
+            gg: [],
+            errorGG: [],
         }
     },
-    // mounted - вызывается после того, как компонент был добавлен в DOM, т.е. србатывает после того как даннные улетели из формы сюда.
-    // после чего он пытается достать и разобрать строку json из localstorage, и если ее нет, присваивает пустой массив
-    mounted(){
 
+    mounted(){
         const savedColumns = localStorage.getItem('columns');
         if (savedColumns) {
             this.columns = JSON.parse(savedColumns);
@@ -56,30 +54,34 @@ Vue.component('notes', {
             this.columns[0].push(note);
             this.saveNotes();
         });
+        eventBus.$on('clear-trues', () => {
+            this.columns[1].forEach(note => {
+                if (note.reasonStatus) {
+                    note.reasonStatus = false;
+                }
+            });
+        });
+        eventBus.$on('endColumn', () => {
+            this.columns[3].forEach(note => {
+                if (note){
+                    if (note.date <= note.deadline){
+                        this.gg.push("GG")
+                    }else{
+                        this.errorGG.push("GABELLA")
+                    }
+                }
+            })
+        })
     },
-    // watch отслеживает изменения, если они есть, то он присваивает и сохраняет новые значения, добавляя их в localstorage и преобразовывая ('stringify') в json формат
     watch: {
-
-
         columns: {
             handler: 'saveNotes',
             deep: true
         },
     },
-    computed: {
-        isFirstColumnBlocked() {
-            return this.columns[1].length === 5;
-        },
-    },
-    // saveNote вызывается после выполнения mounted; присваивает и сохраняет значения в localstorage, преобразовывая ('stringify') их в json формат
     methods: {
         saveNotes() {
             localStorage.setItem('columns', JSON.stringify(this.columns));
-        },
-
-        getIndex(task) {
-            let tasking = this.columns[task.columnIndex][task.indexNote]
-            this.changeTask(tasking, task)
         },
 
         deleteTask(task){
@@ -87,7 +89,9 @@ Vue.component('notes', {
         },
 
         nextColumn(task) {
-            console.log("ДАЛЕЕЕ", task)
+
+            console.log(this.columns[task.columnIndex][task.indexNote].date,'-', this.columns[task.columnIndex][task.indexNote].deadline)
+            console.log(typeof (this.columns[task.columnIndex][task.indexNote].date),'-', typeof (this.columns[task.columnIndex][task.indexNote].deadline))
             let move = this.columns[task.columnIndex].splice(task.indexNote, 1)
             this.columns[task.columnIndex+1].push(...move)
         },
@@ -97,16 +101,19 @@ Vue.component('notes', {
         },
 
         reasonStatusEdit(task){
-            console.log(task)
             this.columns[task.columnIndex][task.indexNote].reasonStatus = !this.columns[task.columnIndex][task.indexNote].reasonStatus
+
         },
         reasonBackFun(task){
-            console.log("sadas: ", task)
             this.columns[2][task.indexNote].reason = task.reasonBack
             let move = this.columns[2].splice(task.indexNote, 1)
             this.columns[1].push(...move)
-        }
 
+            this.clearTrues()
+        },
+        clearTrues(task){
+            eventBus.$emit('clear-trues', task)
+        }
     }
 
 })
@@ -130,31 +137,40 @@ Vue.component('note', {
             type: Number,
             required: true
         },
-
+        gg: {
+            type: Array,
+            required: false
+        },
+        errorGG: {
+            type: Array,
+            required: false
+        }
     },
 
     template: `
         <div>
             <p>{{ name }}</p>
             <div class="note">
-                <h1 v-for="error in errors"> {{ error }}</h1>
                 <ul>
                     <li v-for="(note, indexNote) in column" class="li-list" >
-                        <h1>{{ note.name }}</h1>
-                        <p>Описание: {{ note.desc }}</p>
-                        <p>Начало: {{ note.date }}</p>
-                        <p>Дэдайн: {{ note.deadline }}</p>
-                        <p>{{ note.reasonStatus }}</p>
+                        <h1>{{ gg }}</h1>
+                        <h2>{{ note.name }}</h2>
+                        <p><b>Описание: </b>{{ note.desc }}</p>
+                        <p><b>Начало: </b>{{ note.date }}</p>
+                        <p><b>Дэдлайн: </b>{{ note.deadline }}</p>
+                        <p v-if="note.reasonStatus === false"><b>reasonStatus: </b>{{ note.reasonStatus }}</p>
                         
+                        <p v-for="error in errors"> {{ error }}</p>
+                        <p v-if="note.reason !== null"><b>Причина: </b>{{ note.reason }}</p>
                         <button v-show="columnIndex === 0" @click="deleteTask(columnIndex, indexNote, name)">Удалить</button>
                         <button v-show="columnIndex !== 3" @click="nextColumn(columnIndex, indexNote, name)">Далее</button>
                         <button v-show="columnIndex !== 3" @click="editTask(columnIndex, indexNote, name)">Редактировать</button>
                         <button v-show="columnIndex === 2" @click="reasonStatusEdit(columnIndex, indexNote, name, note)">Вернуть</button>
-                        <form v-show="note.reasonStatus === true" @submit.prevent="reasonBackFun(reasonBack, columnIndex, indexNote, name)">
-                            <input type="text" v-model="reasonBack" placeholder="Причина">
+                        <form v-show="note.reasonStatus === true" @submit.prevent="reasonBackFun(reasonBack, columnIndex, indexNote)">
+                            <input type="text" v-model="reasonBack" placeholder="Причина" required>
                             <input type="submit">
                         </form>
-                        <p>{{ note.reason }}</p>
+                        
                     </li>
                 </ul>
             </div>
@@ -183,11 +199,9 @@ Vue.component('note', {
         reasonStatusEdit(columnIndex, indexNote, name, note){
             this.$emit('reasonStatusEdit', {columnIndex, indexNote, name, note})
         },
-        reasonBackFun(reasonBack, columnIndex, indexNote, name){
-            console.log(reasonBack)
-            this.$emit('reasonBackFun', {reasonBack, columnIndex, indexNote, name})
-            note.reasonStatus = false
-        }
+        reasonBackFun(reasonBack, columnIndex, indexNote){
+            this.$emit('reasonBackFun', {reasonBack, columnIndex, indexNote})
+        },
 
     },
 })
@@ -244,7 +258,7 @@ Vue.component('create-note', {
             let month = date.getMonth()+1
             let day = date.getDate()
             let time = date.toLocaleTimeString()
-            let dateline = year + '-' + month + '-' + day + '  ' + time
+            let dateline = year + '-' + month + '-' + day
             this.date = dateline
         },
     },
