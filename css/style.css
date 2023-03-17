@@ -1,6 +1,15 @@
 body{
     margin: 0 auto;
-    background-image: url("./assets/gandalf.gif");
+}
+
+.firstHeader{
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+}
+
+.desc{
+    margin-left: 10px;
 }
 
 h1, h2{
