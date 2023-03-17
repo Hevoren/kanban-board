@@ -15,17 +15,18 @@ h1, h2{
     display: flex;
     flex-direction: row;
     margin: 0 auto;
-}
-
-.note-list{
-    margin-top: 100px;
-    display: flex;
-    flex-direction: row;
-}
-
-.note{
     border: 1px solid black;
-    width: 500px;
+    width: 100%;
+}
+
+.notes-note{
+    width: 25%;
+    border: 1px solid black;
+}
+
+.all{
+    display: flex;
+    flex-direction: column;
 }
 
 .createForm{
@@ -48,13 +49,21 @@ input {
     list-style: none;
     border: 1px solid black;
 }
-
-.li-task{
-    align-items: center;
-    list-style-type: none;
+.errors{
     display: flex;
+    flex-direction: row;
 }
 
-.li-task p{
-    width: 40%;
+.header{
+    display: flex;
+    flex-direction: row;
 }
+
+.image1{
+    width: 50%;
+}
+
+.image2{
+    width: 50%;
+}
+
