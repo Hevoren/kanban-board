@@ -14,7 +14,7 @@ Vue.component('notes', {
         <div class="notes">
             <note :column="columns[0]" :errors="errors_1" :name="nameFirst" @deleteTask="deleteTask" @nextColumn="nextColumn" @editTask="editTask" :columnIndex="columnIndex1"></note>
             <note :column="columns[1]" :errors="errors_2" :name="nameSecond" @nextColumn="nextColumn" :columnIndex="columnIndex2"></note>
-            <note :column="columns[2]" :errors="errors_3" :name="nameThird" @nextColumn="nextColumn" @reasonStatusEdit="reasonStatusEdit" :columnIndex="columnIndex3" ></note>
+            <note :column="columns[2]" :errors="errors_3" :name="nameThird" @nextColumn="nextColumn" @reasonBackFun="reasonBackFun" @reasonStatusEdit="reasonStatusEdit" :columnIndex="columnIndex3" ></note>
             <note :column="columns[3]" :errors="errors_4" :name="nameFourth" :columnIndex="columnIndex4"></note>
         </div>
     `,
@@ -59,6 +59,8 @@ Vue.component('notes', {
     },
     // watch отслеживает изменения, если они есть, то он присваивает и сохраняет новые значения, добавляя их в localstorage и преобразовывая ('stringify') в json формат
     watch: {
+
+
         columns: {
             handler: 'saveNotes',
             deep: true
@@ -94,15 +96,17 @@ Vue.component('notes', {
 
         },
 
-        backTask(task) {
-            let move = this.columns[2].splice(task.indexNote, 1)
-            this.columns[1].push(...move)
-        },
-
         reasonStatusEdit(task){
             console.log(task)
             this.columns[task.columnIndex][task.indexNote].reasonStatus = !this.columns[task.columnIndex][task.indexNote].reasonStatus
         },
+        reasonBackFun(task){
+            console.log("sadas: ", task)
+            this.columns[2][task.indexNote].reason = task.reasonBack
+            let move = this.columns[2].splice(task.indexNote, 1)
+            this.columns[1].push(...move)
+        }
+
     }
 
 })
@@ -140,21 +144,28 @@ Vue.component('note', {
                         <p>Описание: {{ note.desc }}</p>
                         <p>Начало: {{ note.date }}</p>
                         <p>Дэдайн: {{ note.deadline }}</p>
+                        <p>{{ note.reasonStatus }}</p>
+                        
                         <button v-show="columnIndex === 0" @click="deleteTask(columnIndex, indexNote, name)">Удалить</button>
                         <button v-show="columnIndex !== 3" @click="nextColumn(columnIndex, indexNote, name)">Далее</button>
                         <button v-show="columnIndex !== 3" @click="editTask(columnIndex, indexNote, name)">Редактировать</button>
                         <button v-show="columnIndex === 2" @click="reasonStatusEdit(columnIndex, indexNote, name, note)">Вернуть</button>
-                        <p>{{ note.deadline }}</p>
-                        <p>{{ note.reasonStatus }}</p>
-                        <form v-show="note.reasonStatus === true">
-                            <input type="text" >
-                            <input type="submit" @click="" >
+                        <form v-show="note.reasonStatus === true" @submit.prevent="reasonBackFun(reasonBack, columnIndex, indexNote, name)">
+                            <input type="text" v-model="reasonBack" placeholder="Причина">
+                            <input type="submit">
                         </form>
+                        <p>{{ note.reason }}</p>
                     </li>
                 </ul>
             </div>
         </div>
     `,
+
+    data(){
+        return{
+            reasonBack: null
+        }
+    },
 
     methods: {
         deleteTask(columnIndex, indexNote, name){
@@ -171,6 +182,11 @@ Vue.component('note', {
         },
         reasonStatusEdit(columnIndex, indexNote, name, note){
             this.$emit('reasonStatusEdit', {columnIndex, indexNote, name, note})
+        },
+        reasonBackFun(reasonBack, columnIndex, indexNote, name){
+            console.log(reasonBack)
+            this.$emit('reasonBackFun', {reasonBack, columnIndex, indexNote, name})
+            note.reasonStatus = false
         }
 
     },
