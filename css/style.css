@@ -1,0 +1,60 @@
+body{
+    margin: 0 auto;
+}
+
+h1, h2{
+    text-align: center;
+}
+
+.all-notes{
+    display: flex;
+    flex-direction: column;
+}
+
+.notes{
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
+}
+
+.note-list{
+    margin-top: 100px;
+    display: flex;
+    flex-direction: row;
+}
+
+.note{
+    border: 1px solid black;
+    width: 500px;
+}
+
+.createForm{
+    margin: auto;
+    width: 220px;
+    border: 2px solid black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input {
+    border: 1px solid black;
+    margin: 5px;
+    padding: 5px;
+    width: 200px;
+}
+
+.li-list{
+    list-style: none;
+    border: 1px solid black;
+}
+
+.li-task{
+    align-items: center;
+    list-style-type: none;
+    display: flex;
+}
+
+.li-task p{
+    width: 40%;
+}
