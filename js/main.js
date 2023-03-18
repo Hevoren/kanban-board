@@ -122,7 +122,8 @@ Vue.component('notes', {
             this.columns[task.columnIndex][task.indexNote].reasonStatus = !this.columns[task.columnIndex][task.indexNote].reasonStatus
         },
         reasonBackFun(task){
-            this.columns[2][task.indexNote].reason = task.reasonBack
+            this.columns[task.columnIndex][task.indexNote].reason.push(task.reasonBack)
+            console.log(this.columns[task.columnIndex][task.indexNote].reason)
             let move = this.columns[2].splice(task.indexNote, 1)
             this.columns[1].push(...move)
 
@@ -186,7 +187,7 @@ Vue.component('note', {
                                 <p><b>editStatus: </b>{{ note.editStatus }}</p>
                                 <p v-if="note.lastRedactTime">Отредактировано: {{note.lastRedactTime}}</p>
                                 <p v-for="error in errors"> {{ error }}</p>
-                                <p v-if="note.reason !== null"><b>Причина: </b>{{ note.reason }}</p>
+                                <p v-if="note.reason !== null" v-for="q in note.reason"><b>Причина: </b>{{ q }}</p>
                                 <button v-show="columnIndex !== 3" @click="nextColumn(columnIndex, indexNote, name)">Далее</button>
                                 <button v-show="columnIndex === 0" @click="deleteTask(columnIndex, indexNote, name)">Удалить</button>
                                 <button v-show="columnIndex === 2" @click="reasonStatusEdit(columnIndex, indexNote, name, note)">Вернуть</button>
@@ -301,7 +302,7 @@ Vue.component('create-note', {
             date: null,
             deadline: null,
             reasonStatus: false,
-            reason: null,
+            reason: [],
             errors: [],
             gg: null,
             errorGG: [],
