@@ -67,9 +67,9 @@ Vue.component('notes', {
                     console.log("gg", note.gg, typeof (note.gg))
 
                     if (date1 <= date2){
-                        note.gg.push("GG")
+                        note.gg = "GG"
                     }else{
-                        note.errorGG.push("GABELLA")
+                        note.gg = "GABELLA"
                     }
                 }
             })
@@ -180,13 +180,9 @@ Vue.component('note', {
                 <ul>
                     <li v-for="(note, indexNote) in column" class="li-list" >
                         <div class="all">
-                                <div class="errors" v-if="note.gg && columnIndex === 3">
-                                    <h1>{{ note.gg[0] }}</h1>
-                                </div>
-                                <img v-if="note.gg" class="image1" :src="image"  />
-                                <div class="errors" v-if="note.errorGG && columnIndex === 3">
-                                    <h1>{{ note.errorGG[0] }}</h1>
-                                </div>
+                                
+                                    <h1>{{ note.gg }}</h1>
+                                
                             <div class="main">
                                 <h2>{{ note.name }}</h2>
                                 <p><b>Описание: </b>{{ note.desc }}</p>
@@ -230,8 +226,8 @@ Vue.component('note', {
             strDate: null,
             reason: null,
             reasonBack: null,
-            gandalf: "./assets/gandalf.gif",
-            papich: "./assets/papich.gif",
+            // gandalf: "./assets/gandalf.gif",
+            // papich: "./assets/papich.gif",
         }
     },
 
@@ -280,9 +276,9 @@ Vue.component('note', {
 
 
     computed: {
-        image() {
-            return this.gandalf
-        },
+        // image() {
+        //     return this.gandalf
+        // },
     }
 })
 
@@ -311,7 +307,7 @@ Vue.component('create-note', {
             reasonStatus: false,
             reason: null,
             errors: [],
-            gg: [],
+            gg: null,
             errorGG: [],
             id: null,
             editStatus: false
