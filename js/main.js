@@ -60,12 +60,6 @@ Vue.component('notes', {
                 if (note){
                     let date1 = new Date(note.date)
                     let date2 = new Date(note.deadline)
-                    console.log("date", date1, typeof (date1))
-                    console.log("deadline", date2, typeof (date2))
-                    console.log("note", note, typeof (note))
-                    console.log("errorGG", note.errorGG, typeof (note.errorGG))
-                    console.log("gg", note.gg, typeof (note.gg))
-
                     if (date1 <= date2){
                         note.gg = "GG"
                     }else{
@@ -182,7 +176,7 @@ Vue.component('note', {
                         <div class="all">
                                 
                                     <h1>{{ note.gg }}</h1>
-                                
+                                    <img v-if="note.gg" class="image" :src="image"  />
                             <div class="main">
                                 <h2>{{ note.name }}</h2>
                                 <p><b>Описание: </b>{{ note.desc }}</p>
@@ -226,8 +220,8 @@ Vue.component('note', {
             strDate: null,
             reason: null,
             reasonBack: null,
-            // gandalf: "./assets/gandalf.gif",
-            // papich: "./assets/papich.gif",
+            gandalf: "./assets/gandalf.gif",
+            papich: "./assets/papich.gif",
         }
     },
 
@@ -276,9 +270,9 @@ Vue.component('note', {
 
 
     computed: {
-        // image() {
-        //     return this.gandalf
-        // },
+        image() {
+            return this.gandalf
+        },
     }
 })
 
@@ -287,7 +281,9 @@ Vue.component('note', {
 Vue.component('create-note', {
     template: `
         <div class="createNote">
+            <img class="image" :src="image1"  />
             <form class="createForm" @submit.prevent="onSubmit">
+                 
                 <p v-if="errors" v-for="error in errors">{{ error }}</p>
                 <input type="text" placeholder="Название" id="name" v-model="name" required maxlength="10">
                 <input type="text" placeholder="Описание" id="desc" v-model="desc" required>
@@ -310,10 +306,15 @@ Vue.component('create-note', {
             gg: null,
             errorGG: [],
             id: null,
-            editStatus: false
+            editStatus: false,
+            papich: "./assets/papich.gif",
         }
     },
-
+    computed: {
+        image1() {
+            return this.papich
+        },
+    },
 
     methods: {
         onSubmit() {
