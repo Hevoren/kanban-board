@@ -61,9 +61,9 @@ Vue.component('notes', {
                     let date1 = new Date(note.date)
                     let date2 = new Date(note.deadline)
                     if (date1 <= date2){
-                        note.gg = "GG"
+                        note.gg = "Успешное завершение"
                     }else{
-                        note.gg = "GABELLA"
+                        note.gg = "Вы не успели в срок"
                     }
                 }
             })
@@ -220,9 +220,7 @@ Vue.component('note', {
             count: null,
             strDate: null,
             reason: null,
-            reasonBack: null,
-            gandalf: "./assets/gandalf.gif",
-            papich: "./assets/papich.gif",
+            reasonBack: null
         }
     },
 
@@ -282,7 +280,6 @@ Vue.component('note', {
 Vue.component('create-note', {
     template: `
         <div class="createNote">
-            <img class="image" :src="image1"  />
             <form class="createForm" @submit.prevent="onSubmit">
                  
                 <p v-if="errors" v-for="error in errors">{{ error }}</p>
@@ -307,14 +304,10 @@ Vue.component('create-note', {
             gg: null,
             errorGG: [],
             id: null,
-            editStatus: false,
-            papich: "./assets/papich.gif",
+            editStatus: false
         }
     },
     computed: {
-        image1() {
-            return this.papich
-        },
     },
 
     methods: {
