@@ -6,10 +6,6 @@ Vue.component('all-notes', {
                 
                 <div class="firstHeader">
                     <create-note></create-note>
-                    <div class="desc">
-                        <p><b>GABELLA - не успели в срок</b></p>
-                        <p><b>GG - успели в срок</b></p>
-                    </div>
                 </div>
                     
                 <div>
@@ -106,6 +102,8 @@ Vue.component('notes', {
             this.columns[task.columnIndex].splice(task.indexNote, 1)
         },
         nextColumn(task) {
+            let redTask = this.columns[task.columnIndex][task.indexNote]
+            redTask.editStatus = false
             let move = this.columns[task.columnIndex].splice(task.indexNote, 1)
             this.columns[task.columnIndex+1].push(...move)
             if (task.columnIndex+1 === 3) {
@@ -177,14 +175,11 @@ Vue.component('note', {
                         <div class="all">
                                 
                                     <h1>{{ note.gg }}</h1>
-                                    <img v-if="note.gg" class="image" :src="image"  />
                             <div class="main">
                                 <h2>{{ note.name }}</h2>
                                 <p><b>Описание: </b>{{ note.desc }}</p>
                                 <p><b>Начало: </b>{{ note.date }}</p>
                                 <p><b>Дэдлайн: </b>{{ note.deadline }}</p>
-                                <p><b>reasonStatus: </b>{{ note.reasonStatus }}</p>
-                                <p><b>editStatus: </b>{{ note.editStatus }}</p>
                                 <p v-if="note.lastRedactTime">Отредактировано: {{note.lastRedactTime}}</p>
                                 <p v-for="error in errors"> {{ error }}</p>
                                 <p v-if="note.reason !== null" v-for="q in note.reason"><b>Причина: </b>{{ q }}</p>
@@ -266,13 +261,6 @@ Vue.component('note', {
             this.$emit('editStatus', {columnIndex, indexNote, note})
         }
     },
-
-
-    computed: {
-        image() {
-            return this.gandalf
-        },
-    }
 })
 
 
