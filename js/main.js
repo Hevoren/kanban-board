@@ -107,7 +107,6 @@ Vue.component('notes', {
             let move = this.columns[task.columnIndex].splice(task.indexNote, 1)
             this.columns[task.columnIndex+1].push(...move)
             if (task.columnIndex+1 === 3) {
-                console.log(move[0])
                 eventBus.$emit('check-deadline', move[0]);
             }
         },
@@ -120,12 +119,16 @@ Vue.component('notes', {
             this.columns[task.columnIndex][task.indexNote].reasonStatus = !this.columns[task.columnIndex][task.indexNote].reasonStatus
         },
         reasonBackFun(task){
-            this.columns[task.columnIndex][task.indexNote].reason.push(task.reasonBack)
-            console.log(this.columns[task.columnIndex][task.indexNote].reason)
-            let move = this.columns[2].splice(task.indexNote, 1)
-            this.columns[1].push(...move)
+            if (task.columnIndex === 2) {
+                if (this.columns[task.columnIndex][task.indexNote] === task.note) {
+                    this.columns[task.columnIndex][task.indexNote].reason.push(task.reasonBack);
 
-            this.clearTrues()
+                    let move = this.columns[task.columnIndex].splice(task.indexNote, 1);
+                    this.columns[task.columnIndex - 1].push(...move);
+
+                    this.clearTrues();
+                }
+            }
         },
         clearTrues(task){
             eventBus.$emit('clear-trues', task)
@@ -136,7 +139,6 @@ Vue.component('notes', {
             goingRedTask.desc=task.redTaskReviw.redDescription
             goingRedTask.deadline=task.redTaskReviw.redDeadline
             goingRedTask.lastRedactTime=task.redTaskReviw.redDate
-            console.log(goingRedTask)
         },
     }
 
@@ -189,7 +191,7 @@ Vue.component('note', {
                                 <button v-show="columnIndex !== 3" @click="redactTask(columnIndex, indexNote, name)">Редактировать</button>
                             </div>
                         </div>
-                        <form v-show="note.reasonStatus === true" @submit.prevent="reasonBackFun(reasonBack, columnIndex, indexNote)">
+                        <form v-show="note.reasonStatus === true" @submit.prevent="reasonBackFun(reasonBack, columnIndex, indexNote, note)">
                             <input type="text" v-model="reasonBack" placeholder="Причина" required>
                             <input type="submit">
                         </form>
@@ -223,13 +225,13 @@ Vue.component('note', {
     methods: {
         onSubmit(columnIndex, indexNote) {
             this.redDateTask()
-            redTaskReviw = {
+            redTaskReview = {
                 redName: this.redName,
                 redDescription: this.redDescription,
                 redDeadline: this.redDeadline,
                 redDate: this.redDate
             }
-            this.$emit('redSub', {redTaskReviw, columnIndex, indexNote})
+            this.$emit('redSub', {redTaskReview, columnIndex, indexNote})
             this.redName = null
             this.redDescription = null
             this.redDeadline = null
@@ -254,8 +256,9 @@ Vue.component('note', {
         reasonStatusEdit(columnIndex, indexNote, name, note){
             this.$emit('reasonStatusEdit', {columnIndex, indexNote, name, note})
         },
-        reasonBackFun(reasonBack, columnIndex, indexNote){
-            this.$emit('reasonBackFun', {reasonBack, columnIndex, indexNote})
+        reasonBackFun(reasonBack, columnIndex, indexNote, note){
+            console.log("note", note)
+            this.$emit('reasonBackFun', {reasonBack, columnIndex, indexNote, note})
         },
         editStatus(columnIndex, indexNote, note){
             this.$emit('editStatus', {columnIndex, indexNote, note})
